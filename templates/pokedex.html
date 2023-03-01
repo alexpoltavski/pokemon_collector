@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">        <title>Pokedex</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.css">
+        <script src="/editablegrid.js"></script>
+        <link rel="stylesheet" href="../../editablegrid.css" type="text/css" media="screen">
+        <script>
+			window.onload = function() {
+              editableGrid = new EditableGrid("DemoGridAttach", { sortIconUp: "up.png", sortIconDown: "down.png"});
+
+				// we build and load the metadata in Javascript
+				editableGrid.load({ metadata: [
+					{ name: "number", datatype: "integer", editable: false },
+					{ name: "picture", datatype: "string", editable: false },
+					{ name: "name", datatype: "string", editable: false },
+					{ name: "points", datatype: "integer", editable: true },
+					{ name: "level", datatype: "integer", editable: false },
+					{ name: "status", datatype: "string", editable: true },
+					{ name: "type", datatype: "string", editable: false },
+					{ name: "type2", datatype: "string", editable: false },
+					{ name: "map", datatype: "string", editable: false },
+					{ name: "map2", datatype: "string", editable: false },
+				]});
+
+				// then we attach to the HTML table and render it
+				editableGrid.attachToHTMLTable('table_id');
+				editableGrid.renderGrid();
+			}
+		</script>
+
+
+        <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.js"></script>
+        <script type=text/javascript>
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            $(document).ready( function () {
+                $('#table_id').DataTable();
+            } );
+
+        </script>
+    </head>
+
+    <body>
+
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://tariki.pythonanywhere.com">Главная</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Покедекс <span class="sr-only">(current)</span></a></li>
+        <li><a href="/progress">Прогресс</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+        <li><p class="navbar-text">{{pokebals[0].owner.coach}}</p></li>
+        </ul>
+        </div>
+  </div>
+</nav>
+<div class="container">
+<div class="table-responsive">
+<table id="table_id" class="table table-hover">
+<thead>
+    <tr>
+    <th>Номер</th>
+    <th></th>
+    <th>Покемон</th>
+    <th>Очки</th>
+    <th>Уровень</th>
+    <th>Статус</th>
+    <th>Тип</th>
+    <th>Тип</th>
+    <th>Карта №1</th>
+    <th>Карта №2</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% set n=0 %}
+    {% for pok in pokebals %}
+    {% set n=n+1 %}
+    <tr>
+        <td>{{n}} </td>
+        <td> <img class="img-responsive" src={{pok.pokemon.image}}></td>
+        <td>{{pok.pokemon.name}} </td>
+        <td>{{pok.exp.points}} </td>
+        <td>{{pok.exp.level}} </td>
+        <td>
+        {% if pok.status=='Актив' %}
+        <span class="label label-primary"> Актив </span>
+        {% else %}
+        {% if pok.status=='Прокачан' %}
+        <span class="label label-success"> Прокачан </span>
+        {% else %}
+        {% if pok.status=='Эволют' %}
+        <span class="label label-warning"> Эволют </span>
+        {% else %}
+        <span class="label label-default"> {{pok.status}} </span>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        </td>
+        {% if pok.pokemon.types[0]%}
+        <td>{{pok.pokemon.types[0].type.ptype}}</td>
+        {% else %}
+        <td> - </td>
+        {% endif %}
+        {% if pok.pokemon.types[1]%}
+        <td>{{pok.pokemon.types[1].type.ptype}}</td>
+        {% else %}
+        <td> - </td>
+        {% endif %}
+        <td>{% for k in pok.pokemon.locat(1)%}
+        <p>{{k}}</p>{% endfor %}</td>
+        <td>{% for k in pok.pokemon.locat(2)%}
+        {{k}}{% endfor %}</td>
+
+
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+</div>
+    </body>
+</html>
